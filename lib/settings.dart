@@ -1,20 +1,11 @@
 import 'package:flutter/material.dart';
 
-class Settings extends StatelessWidget{
-  @override
-  Widget build(BuildContext context){
-    return SettingsContent();
-  }
-}
-
-class SettingsContent extends StatefulWidget{
+class Settings extends StatefulWidget{
   @override
   _SettingsState createState() => _SettingsState();
 }
 
-class _SettingsState extends State<SettingsContent>{
-  bool b = false;
-
+class _SettingsState extends State<Settings>{
   @override
   Widget build(BuildContext context) {
     return Scaffold(

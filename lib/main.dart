@@ -5,80 +5,111 @@ import 'package:camera/camera.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  runApp(App());
+  final cameras = await availableCameras();
+  final firstCamera = cameras.first;
+  runApp(App(camera: firstCamera));
 }
 
+class App extends StatelessWidget{
+  final CameraDescription camera;
+  const App({
+    @required this.camera
+  });
 
-class App extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'ESP 3D-Scanner',
-      theme: ThemeData(
-        primarySwatch: Colors.green,
-      ),
-      home: HomePage(title: 'Home Page'),
+      theme: ThemeData.dark(),
+      home: HomePage(camera: camera)
     );
   }
 }
 
-class HomePage extends StatefulWidget {
-  HomePage({Key key, this.title}) : super(key: key);
-  final String title;
+class HomePage extends StatefulWidget{
+  final CameraDescription camera;
+  const HomePage({
+    @required this.camera
+  });
+
+  @override
   HomePageState createState() => HomePageState();
 }
 
 class HomePageState extends State<HomePage> {
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        actions: [
-          IconButton(
-            icon: Icon(Icons.settings),
-            onPressed: () {
-              Navigator.push(context, MaterialPageRoute(builder: (context) => Settings()));
-            },
-          )
-        ],
-      ),
-      body:Center(
-        child: Column(
-          children: <Widget>[
-            Camera()
+        appBar: AppBar(
+          actions: [
+            IconButton(
+              icon: Icon(Icons.settings),
+              onPressed: () {
+                Navigator.push(context, MaterialPageRoute(builder: (context) => Settings()));
+                print("Going to settings");
+              },
+            )
           ],
-        )
-      )
-    );
+        ),
+        body: Center(
+          child: Column(
+            children: <Widget>[
+              Camera(camera: widget.camera),
+            ]
+          )
+        ),
+      );
   }
 }
 
-
 class Camera extends StatefulWidget{
-  
+  final CameraDescription camera;
+
+  const Camera({
+    Key key,
+    @required this.camera,
+  }) : super(key: key);
 
   @override
   CameraState createState() => CameraState();
 }
 
 class CameraState extends State<Camera>{
-  CameraDescription camera;
   CameraController _controller;
   Future<void> _initializeControllerFuture;
+
   @override
-  void initState() async{
-    final cameras = await availableCameras();
-    camera = cameras.first;
+  void initState(){
+    super.initState();
     _controller = CameraController(
-      camera,
-      ResolutionPreset.low
+      widget.camera,
+      ResolutionPreset.high
     );
     _initializeControllerFuture = _controller.initialize();
   }
   @override
   Widget build(BuildContext context) {
-    return CameraPreview(_controller);
+    return Column(
+      children: <Widget>[
+        FutureBuilder<void> (
+          future: _initializeControllerFuture,
+          builder: (context, snapshot){
+            if(snapshot.connectionState == ConnectionState.done){
+              return CameraPreview(_controller);
+            }
+            else{
+              return CircularProgressIndicator();
+            }
+          }
+        ),
+        ElevatedButton(
+          onPressed: () async{
+            final image = await _controller.takePicture();
+            print(image.path);
+          },
+          child: Text("Take a goddamn Picture!")
+        )
+      ]
+    );
   }
 }
-
