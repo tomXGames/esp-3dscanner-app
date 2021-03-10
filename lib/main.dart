@@ -3,35 +3,31 @@ import 'package:flutter/material.dart';
 import 'settings.dart';
 import 'package:camera/camera.dart';
 
+CameraDescription camera;
+
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   final cameras = await availableCameras();
-  final firstCamera = cameras.first;
-  runApp(App(camera: firstCamera));
+  camera = cameras.first;
+  runApp(App());
 }
 
 class App extends StatelessWidget{
-  final CameraDescription camera;
-  const App({
-    @required this.camera
-  });
+
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'ESP 3D-Scanner',
       theme: ThemeData.dark(),
-      home: HomePage(camera: camera)
+      home: HomePage('ESP 3D-Scanner')
     );
   }
 }
 
 class HomePage extends StatefulWidget{
-  final CameraDescription camera;
-  const HomePage({
-    @required this.camera
-  });
-
+  final String title;
+  HomePage(this.title);
   @override
   HomePageState createState() => HomePageState();
 }
@@ -41,6 +37,7 @@ class HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
+          title: Text(widget.title),
           actions: [
             IconButton(
               icon: Icon(Icons.settings),
@@ -54,7 +51,7 @@ class HomePageState extends State<HomePage> {
         body: Center(
           child: Column(
             children: <Widget>[
-              Camera(camera: widget.camera),
+              Camera(),
             ]
           )
         ),
@@ -63,13 +60,6 @@ class HomePageState extends State<HomePage> {
 }
 
 class Camera extends StatefulWidget{
-  final CameraDescription camera;
-
-  const Camera({
-    Key key,
-    @required this.camera,
-  }) : super(key: key);
-
   @override
   CameraState createState() => CameraState();
 }
@@ -82,7 +72,7 @@ class CameraState extends State<Camera>{
   void initState(){
     super.initState();
     _controller = CameraController(
-      widget.camera,
+      camera,
       ResolutionPreset.high
     );
     _initializeControllerFuture = _controller.initialize();
@@ -104,13 +94,14 @@ class CameraState extends State<Camera>{
         ),
         ElevatedButton(
           onPressed: () async{
-            final image = await _controller.takePicture();
-            print(image.path);
-            GallerySaver.saveImage(image.path, albumName: "ESP3D-Scanner"); /*This plugin has a lot of bugs... Has to change some stuff around in the FileUtils.kt 
-                                                                            file to acutally get it to work. Also just saves in the "Pictures" folder, not the 
-                                                                            specified album. Might wanna contribute to that repo if I have the time.*/
+            for(int i = 0; i < number; i++){
+              final image = await _controller.takePicture();
+              print(image.path);
+              GallerySaver.saveImage(image.path, albumName: "ESP3D-Scanner"); 
+              
+            }
           },
-          child: Text("Take a goddamn Picture!")
+          child: Text("Start scanning!")
         )
       ]
     );
