@@ -28,6 +28,7 @@ dependencies:
   camera: 
   path_provider:
   path:
+  gallery_saver: ^2.0.1
 
 
 dev_dependencies:

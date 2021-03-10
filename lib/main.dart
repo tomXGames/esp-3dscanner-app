@@ -1,5 +1,5 @@
+import 'package:gallery_saver/gallery_saver.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bluetooth_serial/flutter_bluetooth_serial.dart';
 import 'settings.dart';
 import 'package:camera/camera.dart';
 
@@ -106,6 +106,9 @@ class CameraState extends State<Camera>{
           onPressed: () async{
             final image = await _controller.takePicture();
             print(image.path);
+            GallerySaver.saveImage(image.path, albumName: "ESP3D-Scanner"); /*This plugin has a lot of bugs... Has to change some stuff around in the FileUtils.kt 
+                                                                            file to acutally get it to work. Also just saves in the "Pictures" folder, not the 
+                                                                            specified album. Might wanna contribute to that repo if I have the time.*/
           },
           child: Text("Take a goddamn Picture!")
         )
