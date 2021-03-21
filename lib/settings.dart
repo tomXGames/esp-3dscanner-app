@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'dart:async';
 import 'package:flutter/services.dart';
+import 'package:flutter_bluetooth_serial/flutter_bluetooth_serial.dart';
 
-int number;
+int number = 16;
+int timeIntervall = 500;
 
 class Settings extends StatefulWidget{
   @override
@@ -9,8 +12,9 @@ class Settings extends StatefulWidget{
 }
 
 class _SettingsState extends State<Settings>{
+  TextEditingController numberFieldEditingController = TextEditingController(text: number.toString());
+  TextEditingController timeFieldEditingController = TextEditingController(text: timeIntervall.toString());
   @override
-  TextEditingController numberFieldEditingController = TextEditingController(text: "16");
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
@@ -32,6 +36,17 @@ class _SettingsState extends State<Settings>{
                 onSubmitted: (text){
                   number = int.parse(text);
                 },
+              ),
+              TextField(
+                controller: numberFieldEditingController  ,
+                decoration: InputDecoration(labelText: "Time delay between OPhotos"),
+                keyboardType: TextInputType.number,
+                inputFormatters: <TextInputFormatter>[
+                  FilteringTextInputFormatter.digitsOnly
+                ],
+                onSubmitted: (text){
+                  timeIntervall = int.parse(text);
+                },
               )
             ]
           )
@@ -44,3 +59,4 @@ class _SettingsState extends State<Settings>{
       );
   }
 }
+
